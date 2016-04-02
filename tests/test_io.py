@@ -70,11 +70,11 @@ class TestIO(unittest.TestCase):
             -  ---  -""").strip('\n'),
         'csvbook_irregular_columns': dedent("""
             Sheet Name: testfile.csv
-            -  ---  -
+            -  ---  --
             1    2  3
-            4  588  6
+            4  588  16
             7    8
-            -  ---  -""").strip('\n'),
+            -  ---  --""").strip('\n'),
         'column_series': dedent("""
             Sheet Name: pyexcel_sheet1
               Column 1    Column 2    Column 3
@@ -90,6 +90,14 @@ class TestIO(unittest.TestCase):
                      1           2  3
                      4           5  6
                      7           8""").strip('\n'),
+         'column_series_missing_cell': dedent("""
+            Sheet Name: pyexcel_sheet1
+              Column 1    Column 2  Column 3
+            ----------  ----------  ----------
+                     1           2  3
+                     4           5  6
+                     7           8
+                     9          10  11""").strip('\n'),
         'data_frame': dedent("""
             Sheet Name: pyexcel_sheet1
                      Column 1    Column 2    Column 3
@@ -187,7 +195,7 @@ class TestIO(unittest.TestCase):
     def test_csvbook_irregular_columns(self):
         content = [
             [1, 2, 3],
-            [4, 588, 6],
+            [4, 588, 16],
             [7, 8]
         ]
         self.testfile2 = "testfile.csv"
@@ -215,13 +223,26 @@ class TestIO(unittest.TestCase):
             [1, 2, 3],
             [4, 5, 6],
             [7, 8],
-            [9, 10, 11],
         ]
         s = pe.Sheet(content, name_columns_by_row=0)
 
         pe.save_as(array=s, dest_file_name=self.testfile)
 
         self._check_test_file('column_series_irregular_columns')
+
+    def test_column_series_missing_cell(self):
+        content = [
+            ["Column 1", "Column 2", "Column 3"],
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8],
+            [9, 10, 11],
+        ]
+        s = pe.Sheet(content, name_columns_by_row=0)
+
+        pe.save_as(array=s, dest_file_name=self.testfile)
+
+        self._check_test_file('column_series_missing_cell')
 
     def test_data_frame(self):
         content = [
@@ -324,13 +345,23 @@ class TestRst(TestIO):
                      4           5  6
                      7           8
             ==========  ==========  ==========""").strip('\n'),
+        'column_series_missing_cell': dedent("""
+            Sheet Name: pyexcel_sheet1
+            ==========  ==========  ==========
+              Column 1    Column 2  Column 3
+            ==========  ==========  ==========
+                     1           2  3
+                     4           5  6
+                     7           8
+                     9          10  11
+            ==========  ==========  ==========""").strip('\n'),
         'csvbook_irregular_columns': dedent("""
             Sheet Name: testfile.csv
-            =  ===  =
+            =  ===  ==
             1    2  3
-            4  588  6
+            4  588  16
             7    8
-            =  ===  =""").strip('\n'),
+            =  ===  ==""").strip('\n'),
         'data_frame': dedent("""
             Sheet Name: pyexcel_sheet1
             =====  ==========  ==========  ==========
@@ -424,12 +455,22 @@ class TestHTML(TestIO):
             <tr><td style="text-align: right;">         7</td><td style="text-align: right;">         8</td><td>          </td></tr>
             </table>
             </body></html>""").strip('\n'),
+        'column_series_missing_cell': dedent("""
+            <html><header><title>testfile.html</title><body>Sheet Name: pyexcel_sheet1
+            <table>
+            <tr><th style="text-align: right;">  Column 1</th><th style="text-align: right;">  Column 2</th><th>Column 3  </th></tr>
+            <tr><td style="text-align: right;">         1</td><td style="text-align: right;">         2</td><td>3         </td></tr>
+            <tr><td style="text-align: right;">         4</td><td style="text-align: right;">         5</td><td>6         </td></tr>
+            <tr><td style="text-align: right;">         7</td><td style="text-align: right;">         8</td><td>          </td></tr>
+            <tr><td style="text-align: right;">         9</td><td style="text-align: right;">        10</td><td>11        </td></tr>
+            </table>
+            </body></html>""").strip('\n'),
         'csvbook_irregular_columns': dedent("""
             <html><header><title>testfile.html</title><body>Sheet Name: testfile.csv
             <table>
-            <tr><td style="text-align: right;">1</td><td style="text-align: right;">  2</td><td>3</td></tr>
-            <tr><td style="text-align: right;">4</td><td style="text-align: right;">588</td><td>6</td></tr>
-            <tr><td style="text-align: right;">7</td><td style="text-align: right;">  8</td><td> </td></tr>
+            <tr><td style="text-align: right;">1</td><td style="text-align: right;">  2</td><td>3 </td></tr>
+            <tr><td style="text-align: right;">4</td><td style="text-align: right;">588</td><td>16</td></tr>
+            <tr><td style="text-align: right;">7</td><td style="text-align: right;">  8</td><td>  </td></tr>
             </table>
             </body></html>""").strip('\n'),
         'data_frame': dedent("""
@@ -477,8 +518,13 @@ class TestJSON(TestIO):
             '[{"Column 1": 1, "Column 2": 2, "Column 3": 3},'
             ' {"Column 1": 4, "Column 2": 5, "Column 3": 6},'
             ' {"Column 1": 7, "Column 2": 8, "Column 3": ""}]',
+        'column_series_missing_cell':
+            '[{"Column 1": 1, "Column 2": 2, "Column 3": 3},'
+            ' {"Column 1": 4, "Column 2": 5, "Column 3": 6},'
+            ' {"Column 1": 7, "Column 2": 8, "Column 3": ""},'
+            ' {"Column 1": 9, "Column 2": 10, "Column 3": 11}]',
         'csvbook_irregular_columns':
-            '[["1", "2", "3"], ["4", "588", "6"], ["7", "8"]]',
+            '[["1", "2", "3"], ["4", "588", "16"], ["7", "8"]]',
         'data_frame':
             '{"Row 1": {"Column 1": 1, "Column 2": 2, "Column 3": 3}, "Row 2": {"Column 1": 4, "Column 2": 5, "Column 3": 6}, "Row 3": {"Column 1": 7, "Column 2": 8, "Column 3": 9}}',
         'row_series':

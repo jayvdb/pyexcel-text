@@ -122,6 +122,8 @@ class TextSheetWriter(SheetWriterBase):
     def write_array(self, table):
         import tabulate
 
+        #print('write_array', table)
+
         if not isinstance(table, Matrix):
             if not isinstance(table, list):
                 table = list(table)
