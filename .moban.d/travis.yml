@@ -1,5 +1,22 @@
 {% extends "travis.yml.jj2" %}
+{%block extra_matrix %}
+matrix:
+  include:
+    - python: 2.7
+      env: MINREQ=1
 
-{%block custom_install%}
-  - pip install https://github.com/pyexcel/pyexcel/archive/v0.2.1.zip
+    - python: 2.7
+      dist: trusty
+      sudo: required
+      virtualenv:
+        system_site_packages: true
+      addons:
+        apt:
+          sources:
+            - debian-sid
+          packages:
+            - python-texttable
+            - python-tabulate
+            - python-requests
+            - python-coverage
 {%endblock%}

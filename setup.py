@@ -29,7 +29,7 @@ KEYWORDS = [
 ]
 
 INSTALL_REQUIRES = [
-    'pyexcel>=0.2.0',
+    'pyexcel>=0.2.1',
     'tabulate>=0.7.4',
 ]
 
